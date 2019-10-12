@@ -1,0 +1,172 @@
+
+            <!-- main page content. the place to put widgets in. usually consists of .row > .col-lg-* > .widget.  -->
+            <main class="content content-epsilon-greedy" role="main">
+                <!-- Page content -->
+        <h1 class="page-title" id="epsilonGreedyTitle">
+            epsilon greedy
+            <small>
+                <small>epsilon based exploration</small>
+            </small>
+        </h1>
+        
+        
+         <div class="analytics">
+           
+              
+                <div class="row" style="width: 100%; margin-left: 0px; margin-top: 15px; margin-bottom: 15px;">
+
+                  {{ actionButton("runEpsilonGreedyBanditWalkthrough", label=HTML("Walkthrough &#9432;"), style='color: #fff; border-color: #3abf94; background-color: #3abf94;') }}
+
+                  {{ actionButton("runEpsilonGreedyBandit", label="Calculate", style='color: #fff; border-color: #3abf94; background-color: #3abf94;  margin-left:20px;') }}
+                  
+                </div>
+           
+                <div class="row" style="width: 100%; margin-bottom: 15px;">
+                     <div class="col-xl-4 col-md-4" id="playsAndRuns">
+                        <section class="widget mb-0 h-100">
+                          <div class="row">
+                          <div class="col-xl-6 col-md-12">
+                            <header>
+                                <h4>plays</h4>
+                            </header>
+                              <p class="text-muted mb-0"><small>&nbsp;</small></p>
+                              {{ sliderInput('epsilonGreedyPlays', '', 100, 2000, 1000, step = 50) }}
+                          </div>
+                          <div class="col-xl-6 col-md-12">
+                            <header>
+                                <h4>runs</h4>
+                            </header>
+                              <p class="text-muted mb-0"><small>&nbsp;</small></p>
+                              {{ sliderInput('epsilonGreedyRuns', '', 100, 2000, 300, step = 50) }}
+                          </div>
+                          </div>
+                        </section>                    
+                    </div>
+                     <div class="col-xl-4 col-md-4" id="numberOfArms">
+                        <section class="widget mb-0 h-100">
+                          <div class="row" style="margin-left: 0px;">                          
+                            <div class="col-xl-12 col-md-12">
+                              <header>
+                                  <h4>number of arms</h4>
+                              </header>
+                            </div>
+                            <div class="col-xl-12 col-md-12">
+                            <p class="text-muted mb-0"><small>or number of bandits</small></p>
+                              {{ sliderInput('epsilonGreedyNumberOfArms', '', 1, 10, 5, step = 1) }}
+                            </div>
+  
+                            </section>                    
+                    </div>
+                    <div class="col-xl-4 col-md-4" id="epsilonInput">
+                        <section class="widget mb-0 h-100">
+
+                      <div class="row" style="margin-left: 0px;">                          
+                            
+                            <div class="col-xl-12 col-md-12">
+                              <header>
+                                <h4>epsilon input</h4>
+                              </header>
+                            </div>
+  
+                          <div class="col-xl-6 col-md-12">
+
+                              <p class="text-muted mb-0"><small>input 1</small></p>
+                              {{ sliderInput('epsilonValueGreedyBandit1', '', 0, 1, 0.1, step = 0.01) }}
+                          </div>
+                          <div class="col-xl-6 col-md-12">
+                              <p class="text-muted mb-0"><small>input 2</small></p>
+                              {{ sliderInput('epsilonValueGreedyBandit2', '', 0, 1, 0.2, step = 0.01) }}
+                          </div>
+                        </div>
+
+                        </section>                    
+                    </div>
+                </div>
+
+                <div class="row" style="width: 100%;" id="resultsEpsilonGreedyBandit">
+                  <div class="col-xl-6 col-md-6 mb-xlg">
+                    <section class="widget mb-0 h-100">
+                      <header>
+                        <h4>optimal decisions</h4>
+                      </header>
+                        {{ highchartOutput('epsilonGreedyBanditOptimalPerStepHighchart')  }}
+                    </section>
+                  </div>
+                  <div class="col-xl-6 col-md-6 mb-xlg">
+                    <section class="widget mb-0 h-100">
+                      <header>
+                        <h4>average reward</h4>
+                      </header>
+                        {{ highchartOutput('epsilonGreedyBanditValuesPerStepHighchart')  }}
+                    </section>
+                  </div>
+                </div>
+            </div>
+            </main>
+            
+
+  <script>
+    var greedyEpsilonBandit = {
+      init: function () {
+        greedyEpsilonBandit.injectScript("//cdn.jsdelivr.net/intro.js/0.5.0/intro.min.js");
+        greedyEpsilonBandit.injectStyle("//cdn.jsdelivr.net/intro.js/0.5.0/introjs.css");
+        greedyEpsilonBandit.bindEvents();
+      },
+      
+      bindEvents: function () {
+    		$("#runEpsilonGreedyBanditWalkthrough").on("click", function () {
+          greedyEpsilonBandit.setupTour();
+          introJs().setOptions({
+            nextLabel: "Next",
+            prevLabel: "Back",
+            skipLabel: "Exit",
+            doneLabel: "Done",
+            tooltipClass: "",
+            exitOnOverlayClick: false,
+            showStepNumbers: false
+          }).start(); 
+    		});  
+      },
+      
+      injectScript: function (scriptSource) {
+    	  var injectScript = document.createElement("script");
+    	  injectScript.setAttribute("src",scriptSource);
+    	  document.getElementsByTagName("body")[0].appendChild(injectScript);    
+      },
+      
+      injectStyle: function (styleSource) {
+    	  var injectStyle = document.createElement("link");
+    	  injectStyle.setAttribute("href",styleSource);
+    	  injectStyle.setAttribute("rel","stylesheet");
+    	  injectStyle.setAttribute("type","text/css");
+    	  document.getElementsByTagName("head")[0].appendChild(injectStyle);    
+      },
+      
+      setupTour: function () {
+        $("div").removeAttr("data-intro");
+        $("div").removeAttr("data-position");
+        $("div").removeAttr("data-step");
+        greedyEpsilonBandit.insertTourElement("#epsilonGreedyTitle","Consider the following learning problem. You are faced repeatedly with a choice among n different options, or actions. After each choice you receive a numerical reward chosen from a stationary probability distribution that depends on the action you selected. Your objective is to maximize the expected total reward over some time period, for example, over 1000 action selections, plays or time steps.","bottom","1");
+        greedyEpsilonBandit.insertTourElement("#playsAndRuns","The number of set <b>plays</b>, also referred to as action selections or time steps, dictates how long you can keep picking rewards from the (n) different options. Moreover, the number of <b>runs</b> correspond with the number of times we simulate these sequences of plays. Increasing plays ensures more information to ultimately take the right decisions, the numerous runs provide an idea of the average reward and percentage of optimal decisions.","bottom","2");
+        greedyEpsilonBandit.insertTourElement("#numberOfArms","The <b>n-armed bandit</b> problem, so named by analogy to a slot machine, except that it has n levers instead of one, the n which can be decided in this highlighted part. Each action selection is like a play of one of the slot machine’s levers, and the rewards are the payoffs for hitting the jackpot. Through repeated action selections you are to maximize your winnings by concentrating your actions on the best levers. In this case we will create n different reward distributions from a standard normal distribution, where n can be decided here.","bottom","3");
+        greedyEpsilonBandit.insertTourElement("#epsilonInput","If you maintain estimates of the action values, then at any time step there is at least one action whose estimated value is greatest. We call this a <b>greedy</b> action. If you select a greedy action, we say that you are exploiting your current knowledge of the values of the actions. If instead you select one of the <b>nongreedy</b> actions, then we say you are exploring, because this enables you to improve your estimate of the nongreedy action’s value. This nongreedy behavior is also referred to as <b>epsilon greedy</b> when epsilon > 0. Exploitation is the right thing to do to maximize the expected reward on the one step, but exploration may produce the greater total reward in the long run. This panel allows you to pick the ratio of exploration to exploitation actions.","bottom","4");
+        greedyEpsilonBandit.insertTourElement("#runEpsilonGreedyBandit","<div style='color:green'><b>Run the simulation by pressing this button!</b></div>","bottom","5")
+        greedyEpsilonBandit.insertTourElement("#resultsEpsilonGreedyBandit"," The greedy method (epsilon equal to 0) generally improves slightly faster than the other methods at the very beginning, but then levels off at a lower level. The advantage of epsilon greedy over greedy methods depends on the task. For example, suppose the reward variance had been larger, say 10 instead of 1. With noisier rewards it takes more exploration to find the optimal action, and epsilon greedy methods should fare even better relative to the greedy method.","top","6");
+        
+      },
+      
+      insertTourElement: function (elementSelector, content, position, step) {
+        position = typeof position !== "undefined" ? position : "bottom";
+        $(elementSelector).attr({
+          "data-intro": content,
+          "data-position": position,
+          "data-step": step
+        });
+      }
+    }
+     
+    greedyEpsilonBandit.init();
+
+  </script>
+
+            
